@@ -6,9 +6,10 @@
 
 <p align="center">
   <a href="https://github.com/blackwell-systems"><img src="https://raw.githubusercontent.com/blackwell-systems/blackwell-docs-theme/main/badge-trademark.svg" alt="Blackwell Systems" /></a>
+  <a href="https://buymeacoffee.com/blackwellsystems"><img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg" alt="Buy Me A Coffee" /></a>
 </p>
 
-**Parallel AI agents that don't break each other's code.** Planned for [Codex CLI](https://github.com/openai/codex).
+**Parallel AI agents that don't break each other's code.** Now on [Codex CLI](https://github.com/openai/codex).
 
 > **Status:** Early implementation. The hook harness and hook installer exist, but this is not a runnable Polywave implementation yet. See [IMPLEMENTATION-NOTES.md](IMPLEMENTATION-NOTES.md) for the current mapping and enforcement notes, and [ROADMAP.md](ROADMAP.md) for the active implementation plan.
 
