@@ -4,15 +4,17 @@
   <img src="https://raw.githubusercontent.com/blackwell-systems/polywave-protocol/main/assets/logo.png" alt="Polywave" width="600" />
 </p>
 
-[![Blackwell Systems](https://raw.githubusercontent.com/blackwell-systems/blackwell-docs-theme/main/badge-trademark.svg)](https://github.com/blackwell-systems)
+<p align="center">
+  <a href="https://github.com/blackwell-systems"><img src="https://raw.githubusercontent.com/blackwell-systems/blackwell-docs-theme/main/badge-trademark.svg" alt="Blackwell Systems" /></a>
+</p>
 
-**Parallel AI agents that don't break each other's code.** Now on [Codex CLI](https://github.com/openai/codex).
+**Parallel AI agents that don't break each other's code.** Planned for [Codex CLI](https://github.com/openai/codex).
 
-> **Status:** In development. See [IMPLEMENTATION-NOTES.md](IMPLEMENTATION-NOTES.md) for the current mapping and gaps.
+> **Status:** Early implementation. The hook harness and hook installer exist, but this is not a runnable Polywave implementation yet. See [IMPLEMENTATION-NOTES.md](IMPLEMENTATION-NOTES.md) for the current mapping and enforcement notes, and [ROADMAP.md](ROADMAP.md) for the active implementation plan.
 
 ## What is this?
 
-This repo provides the Codex CLI implementation of the [Polywave protocol](https://github.com/blackwell-systems/polywave-protocol): an Agent Skill, custom agent definitions, and enforcement hooks that let Codex coordinate parallel agents with disjoint file ownership and worktree isolation.
+This repo will provide the Codex CLI implementation of the [Polywave protocol](https://github.com/blackwell-systems/polywave-protocol): an Agent Skill, custom agent definitions, and enforcement hooks that let Codex coordinate parallel agents with disjoint file ownership and worktree isolation.
 
 ## Repositories
 
@@ -33,30 +35,134 @@ This repo provides the Codex CLI implementation of the [Polywave protocol](https
 - jq 1.6+
 - `polywave-tools` CLI (see below)
 
-## Install
+## Current Install
+
+The current installer installs the hook package, the `polywave` skill, the progressive-disclosure reference pack and injector scripts, and direct Codex ports of the current Polywave custom agents: `polywave-scout`, `polywave-wave-agent`, `polywave-planner`, `polywave-scaffold-agent`, `polywave-critic-agent`, and `polywave-integration-agent`. The full runnable Polywave flow is still in progress.
 
 ```bash
-# 1. Clone and install
-git clone https://github.com/blackwell-systems/polywave-codex.git ~/code/polywave-codex
-~/code/polywave-codex/install.sh
+./install.sh
+```
 
-# 2. Install polywave-tools CLI (pick one)
-brew install blackwell-systems/tap/polywave-tools                                     # Homebrew (recommended)
-go install github.com/blackwell-systems/polywave-go/cmd/polywave-tools@latest   # Go install
+Use `--write-user-hooks` only if `~/.codex/hooks.json` does not already exist and you want the installer to create it.
 
-# 3. Initialize your project
+Verify the installed Codex artifacts with:
+
+```bash
+./scripts/verify-codex-install
+```
+
+To remove installed hook artifacts:
+
+```bash
+./uninstall.sh
+```
+
+## Planned Polywave Flow
+
+After the full Codex implementation exists, the intended project flow is:
+
+```bash
+# 1. Install polywave-tools CLI (pick one)
+brew install blackwell-systems/tap/polywave-tools
+go install github.com/blackwell-systems/polywave-go/cmd/polywave-tools@latest
+
+# 2. Initialize your project
 cd your-project
 polywave-tools init
 
-# 4. Verify
+# 3. Install the Codex skill/agents/hooks
+~/code/polywave-codex/install.sh
+
+# 4. Verify the Codex installation
 polywave-tools verify-install
 ```
 
-**5. Restart Codex**, then run:
+After the Codex implementation exists, restart Codex and run:
 
 ```
 $polywave scout "add a caching layer to the API client"
 ```
+
+## Primary Execution Surface
+
+The primary product surface is the active Codex CLI loop with the installed `$polywave` skill.
+
+Use the skill in the live Codex session for real Polywave orchestration. The repo-local scripts are supporting tools for development, debugging, and fallback automation; they are not the primary interface.
+
+## Progressive Disclosure
+
+> **Codex limitation:** Codex does not support Claude Code's automatic subagent prompt rewrite path (`updatedInput` on agent launch), so progressive disclosure references must be loaded explicitly by the `$polywave` orchestrator or the fallback launcher scripts.
+
+The Codex port now carries the same basic disclosure structure as the Claude implementation:
+
+- core orchestrator skill in `SKILL.md`
+- on-demand protocol references in `references/`
+- deterministic routing scripts in `scripts/inject-context` and `scripts/inject-agent-context`
+
+Because Codex does not expose Claude's agent-prompt rewrite hooks, the live `$polywave` skill must call these scripts explicitly inside the active loop before delegating to Polywave custom agents. The fallback launcher scripts now do the same thing.
+
+The exact primary-path procedure is documented in `references/live-loop-playbook.md` and is now the expected in-loop orchestration contract.
+
+## Minimal Scout Flow
+
+What exists now is the first concrete scout path, not a full orchestration layer.
+
+Current blocker on the primary in-loop path: a fresh live `$polywave scout` proof run loaded the installed skill and disclosure scripts correctly, but custom-agent delegation in Codex did not yet complete, so the primary path still needs explicit launch-contract work before it can be claimed as proven.
+
+1. Install `polywave-tools` and run `./install.sh` from this repo.
+2. Add the target-repo guidance snippet to the target repository if needed:
+
+```bash
+./scripts/print-target-agents-snippet
+```
+
+3. In Codex, invoke the installed `polywave` skill and provide three explicit inputs:
+   - repository root
+   - feature description
+   - absolute IMPL output path
+
+The current scout contract is:
+- `polywave-scout` writes the IMPL manifest
+- the orchestrator validates the IMPL through `polywave-tools`
+- this is the required path for claiming a real scout run
+
+Development/fallback launcher:
+
+```bash
+scripts/run-polywave-scout --repo-dir /path/to/repo --feature "add a caching layer"
+```
+
+## Minimal Wave Flow
+
+Development/fallback launcher:
+
+```bash
+scripts/run-polywave-wave /path/to/docs/IMPL/IMPL-feature.yaml --wave 1 --repo-dir /path/to/repo
+```
+
+Current behavior:
+- calls `polywave-tools prepare-wave --json-only`
+- launches one Codex run per prepared agent worktree
+- calls `polywave-tools finalize-wave` unless `--skip-finalize` is set
+- keeps `polywave-tools` as the authority for worktree prep and merge/finalize
+
+## Development
+
+Run the current hook fixture suite with:
+
+```bash
+scripts/run-hook-fixtures
+```
+
+To capture real Codex hook payloads, temporarily add the optional audit snippet printed by:
+
+```bash
+scripts/print-codex-config
+```
+
+Payloads are written under `${CODEX_HOME:-$HOME/.codex}/polywave/audit`.
+
+Note: `codex exec` on Codex CLI 0.130.0 did not emit audit payloads for a simple shell command during local probing, even with hooks enabled. Validate against the interactive Codex path before relying on runtime hook coverage.
 
 ## License
 
