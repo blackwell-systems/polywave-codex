@@ -111,7 +111,7 @@ What exists now is the first concrete scout path, not a full orchestration layer
 
 Current proven state on the primary path: a live `$polywave scout` proof run wrote a real IMPL manifest and `polywave-tools finalize-scout` passed.
 
-Current state on wave execution: the corrected fallback worker path now completes end to end in a clean proof repo. The primary live `$polywave wave` loop also prepares correctly, but its in-session spawned child-agent path hit a git worktree metadata write failure on agent B. The next primary-path contract is to keep `$polywave` as the orchestrator surface while launching prepared workers via explicit `codex exec --cd <worktree>` from inside the loop (see implementation notes).
+Current state on wave execution: the corrected fallback worker path now completes end to end in a clean proof repo. Two primary-loop worker models have now been tested and both are blocked by current Codex runtime behavior: in-session spawned workers fail at git worktree metadata writes, and nested `codex exec --cd <worktree>` launches from inside the active Codex loop fail earlier with `failed to initialize in-process app-server client: Operation not permitted`. See implementation notes for the exact evidence and current boundary.
 
 1. Install `polywave-tools` and run `./install.sh` from this repo.
 2. Add the target-repo guidance snippet to the target repository if needed:

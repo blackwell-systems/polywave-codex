@@ -181,6 +181,6 @@ When asked to run a wave-like flow:
 2. Load the matching orchestrator context from `scripts/inject-context` when the request maps to wave execution or failure-routing.
 3. Ensure prepare/finalize is routed through `polywave-tools`.
 4. Build the wave-agent prompt with `scripts/build-wave-agent-prompt` from the prepared brief and worktree context.
-5. For prepared wave execution, prefer explicit `codex exec --cd <worktree> "$GENERATED_PROMPT"` launches from the orchestrator loop over in-session spawned custom agents.
-6. Use the generated `polywave-wave-agent` prompt as the worker role payload for those `codex exec` launches.
-7. Launch each worker only with explicit scope and ownership context.
+5. Do not rely on in-session spawned workers for prepared wave commits; that path has shown git worktree metadata write failures in runtime proof.
+6. Do not assume nested `codex exec` launches from inside the active Codex loop are viable either; current runtime proof hit `failed to initialize in-process app-server client: Operation not permitted` before worker execution.
+7. Treat the active `$polywave` loop as the primary orchestration surface, but treat actual prepared worker execution inside that same session as a currently unresolved runtime constraint.
