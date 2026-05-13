@@ -37,7 +37,8 @@ The current procedural contract for this explicit orchestration path is document
 
 Latest runtime proof status:
 - Live-loop scout path: proven to skill activation, manifest creation, and successful `polywave-tools finalize-scout`.
-- Live-loop wave path: proven to prepared worktree discovery and actual agent execution, but not yet cleanly proven end to end through the `$polywave` orchestrator because the merge/finalize path still exposed product bugs.
+- Fallback wave launcher path: now proven end to end in a clean proof repo. `prepare-wave` succeeded, both prepared agents ran, both completion reports were written, and `finalize-wave` completed successfully.
+- Live-loop wave path: still not fully proven end to end through the primary `$polywave` orchestrator surface.
 
 Prompt assembly status:
 - The Codex implementation now ships deterministic prompt builders for `polywave-scout` and `polywave-wave-agent`.
@@ -50,7 +51,8 @@ Concrete defects discovered during wave proof:
 3. `scripts/run-polywave-wave` assumed pure JSON from `prepare-wave --json-only`, but real output can include hook chatter before the JSON payload. Fixed: the launcher now extracts the JSON payload from mixed output before parsing.
 4. The old live `$polywave wave` prompt assembly path re-read too much local state before delegation. Mitigated: deterministic prompt builders now centralize prompt assembly for the primary loop and fallback wrappers.
 5. `run-polywave-wave` originally launched only the first prepared agent because `codex exec` consumed the loop stdin and ate the remaining TSV rows. Fixed: the launcher now reads the agent list on a dedicated file descriptor and runs each `codex exec` with stdin redirected from `/dev/null`.
-6. `finalize-wave` initially failed merge verification for agent A in the earlier proof run; after manual merge of the preserved agent-tip SHA and `finalize-wave --skip-merge`, wave finalization passed. That older failure is now superseded by the launcher stdin bug above and needs to be revalidated on the fixed path.
+6. Revalidation on the fixed launcher succeeded: both prepared agents executed, both commits were verified, both completion reports were written, merge/finalize succeeded, and cleanup removed both worktrees.
+7. During the clean proof run, the expected Polywave env vars were empty inside direct shell inspection within the prepared agents. This did not block execution because the launcher passes explicit worktree, branch, agent id, and repo-root context in the generated prompt, but it remains a hardening follow-up for the live-loop path.
 
 ## Platform Mapping
 

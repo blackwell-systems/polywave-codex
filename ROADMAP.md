@@ -29,7 +29,7 @@ Implementation status as of 2026-05-12:
 - the active Codex CLI loop via `$polywave` is the intended primary execution surface
 - progressive-disclosure references and injector scripts are now ported into the Codex skill install surface
 - live-loop scout proof now reaches manifest creation plus successful `finalize-scout`
-- live-loop wave proof now reaches prepared worktree execution; manual cleanup plus `finalize-wave --skip-merge` succeeded after merge-stage defects were isolated
+- fallback wave launcher proof now completes end to end in a clean repo, including both prepared agents and successful `finalize-wave`
 - deterministic prompt builders now unify live-loop and fallback agent prompt assembly
 - full in-loop scout/wave orchestration flow is still not wired end to end
 
@@ -125,10 +125,12 @@ Completed:
 - added `scripts/run-polywave-wave` as a development/fallback Codex wave launcher
 - generate assigned-worktree instructions into agent launch context from `prepare-wave` output
 - route setup and teardown through `polywave-tools prepare-wave` and `finalize-wave`
+- fixed the multi-agent launcher stdin bug so both prepared agents execute
+- proved one clean fallback wave end to end under Codex
 
 Remaining:
 
-- keep Bash policy and shared LSP file-mutation policy active in a real executed wave
+- keep Bash policy and shared LSP file-mutation policy active in the primary live-loop product path
 - prove one wave can be launched through the installed custom agent path inside the live `$polywave` loop using the installed prompt builders rather than via fallback wrappers
 
 Exit criteria:

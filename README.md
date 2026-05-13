@@ -111,7 +111,7 @@ What exists now is the first concrete scout path, not a full orchestration layer
 
 Current proven state on the primary path: a live `$polywave scout` proof run wrote a real IMPL manifest and `polywave-tools finalize-scout` passed.
 
-Current blocker on the primary wave path: the launcher/input path was dropping prepared agents after the first `codex exec`; that is now fixed and the end-to-end finalize path is being revalidated on the corrected launcher (see implementation notes).
+Current state on the fallback wave path: the corrected launcher now completes end to end in a clean proof repo. Both prepared agents execute, both completion reports are written, and `polywave-tools finalize-wave` succeeds. The remaining product-path gap is the same proof through the primary live `$polywave wave` loop rather than the fallback launcher (see implementation notes).
 
 1. Install `polywave-tools` and run `./install.sh` from this repo.
 2. Add the target-repo guidance snippet to the target repository if needed:
