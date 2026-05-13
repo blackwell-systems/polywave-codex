@@ -22,6 +22,50 @@ The stricter model where one active Codex CLI session both orchestrates and dire
 
 This conclusion is provisional and subject to revision if future Codex runtime behavior changes or a third viable in-loop worker-launch mechanism is found.
 
+## Why Codex Is a UX Downgrade From Claude Code
+
+The Polywave protocol is platform-agnostic. The safety properties (disjoint file ownership, worktree isolation, deterministic merge gates) are identical on both platforms. What differs is the interaction model for wave execution, and the reasons are architectural.
+
+### What Claude Code provides that enables single-session waves
+
+Claude Code's `Agent` tool with `isolation: "worktree"` gives each spawned subagent:
+- Its own git worktree as the working directory
+- Full filesystem write access within that worktree (including `.git/worktrees/<name>/` metadata)
+- An independent process that can `git add`, `git commit`, and write completion reports
+- Lifecycle hooks (SubagentStart, SubagentStop) that inject environment variables, validate isolation, and verify completion before the agent exits
+
+The orchestrator stays in-session, spawns N agents in parallel via the Agent tool, waits for all to complete, then runs finalize. One session, one command, fully automated.
+
+### What Codex provides (and where it diverges)
+
+| Capability | Claude Code | Codex | Impact on Polywave |
+|-----------|-------------|-------|-------------------|
+| Spawn subagent with isolated filesystem | `isolation: "worktree"` gives full write to worktree + its `.git/` metadata | Subagents inherit parent sandbox; `.git/` directories are read-only in `workspace-write` mode | Wave agents cannot `git commit` from inside a parent session |
+| Nested process launch | N/A (agents are in-process) | `codex exec` inside active session fails with `Operation not permitted` | Cannot spawn workers as child processes from the orchestrator session |
+| Subagent lifecycle hooks | SubagentStart, SubagentStop (7 hooks depend on these) | Not available | Cannot inject env vars or validate isolation at lifecycle boundaries |
+| Command rewriting | `updatedInput` in PreToolUse rewrites bash commands | Not available | Cannot auto-prepend `cd $WORKTREE &&` to commands |
+| Per-agent working directory | Set via `isolation: "worktree"` | `codex exec --cd <path>` (top-level only) | Works for out-of-session workers, not for in-session subagents |
+
+### The resulting constraint
+
+The single-session Claude Code wave experience depends on two capabilities Codex does not provide:
+1. **Writable `.git/` metadata for child agents** (needed for `git commit`)
+2. **Spawning isolated processes from within a session** (either via subagent isolation or nested exec)
+
+Without either, wave workers must run as top-level `codex exec` processes. The orchestrator cannot host them. This forces the sequential two-step flow:
+- Scout: in-session (works because scout doesn't commit to a worktree branch)
+- Wave: out-of-session (workers need commit access that only top-level processes get)
+
+### What would close the gap
+
+Any of these Codex changes would enable single-session wave execution:
+- `.git/worktrees/<name>/` made writable for child agents when the parent worktree root is in `writable_roots`
+- A per-agent `sandbox_mode` or `writable_roots` override that actually takes effect for spawned subagents
+- Support for `codex exec` launched from within an active session (nested exec)
+- A SubagentStart hook or agent config option that sets the child's working directory with full write access
+
+Until then, the hybrid model (scout in-session, wave from shell) is the correct design, not a workaround.
+
 ## Current Recommended Usage
 
 Use one terminal, sequentially:
