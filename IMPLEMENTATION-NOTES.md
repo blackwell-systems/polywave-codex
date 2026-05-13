@@ -8,9 +8,9 @@ Primary execution surface:
 - the active Codex CLI loop via the installed `$polywave` skill
 
 Secondary surfaces:
-- repo-local launcher scripts for development, debugging, and fallback automation
+- repo-local launcher scripts for development and wave execution
 
-Implementation decisions should optimize for the in-loop `$polywave` path first. Wrapper scripts are supporting tools, not the main product surface.
+Implementation decisions should optimize for the in-loop `$polywave` path where it is proven. The current blessed wave path is the shell launcher, not the fully in-session loop.
 
 ## Provisional Conclusion
 
@@ -72,7 +72,7 @@ The current procedural contract for this explicit orchestration path is document
 
 Latest runtime proof status:
 - Live-loop scout path: proven to skill activation, manifest creation, and successful `polywave-tools finalize-scout`.
-- Fallback wave launcher path: now proven end to end in a clean proof repo. `prepare-wave` succeeded, both prepared agents ran, both completion reports were written, and `finalize-wave` completed successfully.
+- Shell wave launcher path: now proven end to end in a clean proof repo. `prepare-wave` succeeded, both prepared agents ran, both completion reports were written, and `finalize-wave` completed successfully.
 - Live-loop wave path: prepare/delegate/finalize orchestration is partially proven, but neither tested worker-launch mechanism is fully viable yet inside the active Codex loop. One primary-path proof run prepared correctly, agent A completed, and agent B failed to create `.git/worktrees/.../index.lock`, causing `status: blocked` and an expected `finalize-wave` refusal under E7. A second primary-path proof used explicit nested `codex exec --cd <worktree>` worker launches from inside the live loop; both launches failed immediately with `failed to initialize in-process app-server client: Operation not permitted`.
 
 Prompt assembly status:
