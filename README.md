@@ -152,7 +152,7 @@ scripts/run-polywave-scout --repo-dir /path/to/repo --feature "add a caching lay
 
 ## Minimal Wave Flow
 
-Development/fallback launcher:
+Current blessed wave path:
 
 ```bash
 scripts/run-polywave-wave /path/to/docs/IMPL/IMPL-feature.yaml --wave 1 --repo-dir /path/to/repo
@@ -163,6 +163,8 @@ Current behavior:
 - launches one Codex run per prepared agent worktree
 - calls `polywave-tools finalize-wave` unless `--skip-finalize` is set
 - keeps `polywave-tools` as the authority for worktree prep and merge/finalize
+
+This is a real automated product path, not just a debugging fallback.
 
 ## Development
 

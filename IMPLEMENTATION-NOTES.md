@@ -22,6 +22,15 @@ The stricter model where one active Codex CLI session both orchestrates and dire
 
 This conclusion is provisional and subject to revision if future Codex runtime behavior changes or a third viable in-loop worker-launch mechanism is found.
 
+## Current Recommended Usage
+
+Use one terminal, sequentially:
+
+1. Run scout in-session with `$polywave scout ...` or as a one-shot `codex exec` command.
+2. Run wave execution from the shell with `scripts/run-polywave-wave <impl> --wave <N> --repo-dir <repo>`.
+
+This is the current blessed user path. It does not require two terminal windows, and it does not require the user to keep one persistent Codex session open through wave execution.
+
 ## Relevant Codex Config Evidence
 
 Official Codex configuration docs support several parts of the current interpretation:

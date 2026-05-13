@@ -1,8 +1,12 @@
 # Live Loop Playbook
 
-This document defines the primary Polywave execution path for Codex CLI.
+This document defines the current proven Polywave execution paths for Codex CLI.
 
-The primary product surface is the active Codex loop with the installed `$polywave` skill. External launcher scripts are fallback and development tools only.
+Current recommended usage is hybrid:
+- active Codex loop with `$polywave scout` for scout
+- shell execution of `scripts/run-polywave-wave` for wave
+
+One terminal is enough. Run these sequentially.
 
 ## Constraint
 

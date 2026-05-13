@@ -4,7 +4,7 @@
 
 This roadmap is the implementation control document for the Codex port of Polywave.
 
-Current provisional execution conclusion: Polywave is viable on Codex with out-of-session `codex exec` workers, while the pure in-session wave-worker model remains blocked in the tested runtime. This should be treated as current evidence, not a permanent platform claim.
+Current provisional execution conclusion: Polywave is viable on Codex with out-of-session `codex exec` workers, while the pure in-session wave-worker model remains blocked in the tested runtime. This should be treated as current evidence, not a permanent platform claim. The current blessed UX is a one-terminal sequential flow: in-session scout, then CLI wave launcher.
 Official Codex config docs are consistent with that reading: writable roots are configurable, agent concurrency/depth are configurable, and the advanced config docs warn that some environments still keep `.git/` and `.codex/` read-only in `workspace-write` mode.
 
 It separates:
