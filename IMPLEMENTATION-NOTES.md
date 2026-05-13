@@ -66,6 +66,16 @@ Any of these Codex changes would enable single-session wave execution:
 
 Until then, the hybrid model (scout in-session, wave from shell) is the correct design, not a workaround.
 
+### Different trust models, different capability surfaces
+
+This gap is not Polywave-specific. Any orchestration pattern that needs "spawn N workers, each commits to its own branch, orchestrator merges" hits the same wall on Codex. The constraint is architectural: Codex's sandbox protects `.git/` metadata from child processes.
+
+Claude Code's `isolation: "worktree"` was purpose-built for this pattern. Anthropic designed the Agent tool with "workers need to commit independently" as a first-class use case. The trust model assumes: the parent orchestrator is trusted to decide what workers can do, workers are scoped to their worktree by the platform, and commits are how work is reported.
+
+Codex's sandbox was designed for a different trust model: protect the user's repo from a single agent that might do something wrong. The sandbox boundary is "one agent, one repo, limited writes." Multi-agent parallel commits were not a design target.
+
+Neither trust model is wrong. They serve different use cases. But for Polywave-style parallel agent orchestration, Claude Code's model is a better fit today.
+
 ## Current Recommended Usage
 
 Use one terminal, sequentially:
