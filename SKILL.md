@@ -181,5 +181,6 @@ When asked to run a wave-like flow:
 2. Load the matching orchestrator context from `scripts/inject-context` when the request maps to wave execution or failure-routing.
 3. Ensure prepare/finalize is routed through `polywave-tools`.
 4. Build the wave-agent prompt with `scripts/build-wave-agent-prompt` from the prepared brief and worktree context.
-5. Delegate to `polywave-wave-agent` from the live Codex loop using that generated prompt.
-6. Launch `polywave-wave-agent` only with explicit scope and ownership context.
+5. For prepared wave execution, prefer explicit `codex exec --cd <worktree> "$GENERATED_PROMPT"` launches from the orchestrator loop over in-session spawned custom agents.
+6. Use the generated `polywave-wave-agent` prompt as the worker role payload for those `codex exec` launches.
+7. Launch each worker only with explicit scope and ownership context.

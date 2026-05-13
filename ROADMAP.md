@@ -31,7 +31,7 @@ Implementation status as of 2026-05-12:
 - live-loop scout proof now reaches manifest creation plus successful `finalize-scout`
 - fallback wave launcher proof now completes end to end in a clean repo, including both prepared agents and successful `finalize-wave`
 - deterministic prompt builders now unify live-loop and fallback agent prompt assembly
-- full in-loop scout/wave orchestration flow is still not wired end to end
+- full in-loop scout/wave orchestration flow is still not wired end to end; primary-path wave execution now needs the explicit `codex exec` worker-launch contract instead of in-session spawned workers
 
 The current proven enforcement boundary is:
 
@@ -131,7 +131,7 @@ Completed:
 Remaining:
 
 - keep Bash policy and shared LSP file-mutation policy active in the primary live-loop product path
-- prove one wave can be launched through the installed custom agent path inside the live `$polywave` loop using the installed prompt builders rather than via fallback wrappers
+- prove one wave through the primary `$polywave` loop using explicit `codex exec` worker launches from inside the loop, rather than in-session spawned workers
 
 Exit criteria:
 

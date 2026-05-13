@@ -38,7 +38,7 @@ The current procedural contract for this explicit orchestration path is document
 Latest runtime proof status:
 - Live-loop scout path: proven to skill activation, manifest creation, and successful `polywave-tools finalize-scout`.
 - Fallback wave launcher path: now proven end to end in a clean proof repo. `prepare-wave` succeeded, both prepared agents ran, both completion reports were written, and `finalize-wave` completed successfully.
-- Live-loop wave path: still not fully proven end to end through the primary `$polywave` orchestrator surface.
+- Live-loop wave path: prepare/delegate/finalize orchestration is partially proven, but the in-session spawned child-agent path is not viable yet for worktree commits. One primary-path proof run prepared correctly, agent A completed, and agent B failed to create `.git/worktrees/.../index.lock`, causing `status: blocked` and an expected `finalize-wave` refusal under E7.
 
 Prompt assembly status:
 - The Codex implementation now ships deterministic prompt builders for `polywave-scout` and `polywave-wave-agent`.
@@ -53,6 +53,7 @@ Concrete defects discovered during wave proof:
 5. `run-polywave-wave` originally launched only the first prepared agent because `codex exec` consumed the loop stdin and ate the remaining TSV rows. Fixed: the launcher now reads the agent list on a dedicated file descriptor and runs each `codex exec` with stdin redirected from `/dev/null`.
 6. Revalidation on the fixed launcher succeeded: both prepared agents executed, both commits were verified, both completion reports were written, merge/finalize succeeded, and cleanup removed both worktrees.
 7. During the clean proof run, the expected Polywave env vars were empty inside direct shell inspection within the prepared agents. This did not block execution because the launcher passes explicit worktree, branch, agent id, and repo-root context in the generated prompt, but it remains a hardening follow-up for the live-loop path.
+8. Primary live-loop proof with in-session spawned workers exposed a separate blocker: agent B failed to commit because git could not create `/private/tmp/polywave-live-loop-wave-proof-live1/.git/worktrees/wave1-agent-B/index.lock` under the child-agent sandbox. This is the current reason to prefer explicit `codex exec --cd <worktree>` worker launches from the `$polywave` orchestrator loop.
 
 ## Platform Mapping
 

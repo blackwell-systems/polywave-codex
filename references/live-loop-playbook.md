@@ -76,9 +76,13 @@ Procedure:
      --brief-path <brief-path> \
      --repo-dir <repo-root>
    ```
-4. Delegate to `polywave-wave-agent` for that prepared worktree.
-5. Require each agent to write completion via `polywave-tools set-completion`. When repository context must be explicit, use the global flag form: `polywave-tools --repo-dir <repo-root> set-completion ...`.
-6. Finalize with:
+4. Launch the prepared worker from the live loop with explicit `codex exec` targeting the prepared worktree, using the generated `polywave-wave-agent` prompt as the payload.
+   ```bash
+   codex exec --skip-git-repo-check --sandbox workspace-write --cd <worktree> "$GENERATED_PROMPT"
+   ```
+5. Prefer this explicit worker-launch path over in-session spawned custom agents for wave execution. The current live-loop child-agent path can fail at git worktree metadata writes (`.git/worktrees/.../index.lock`) even when the fallback `codex exec` worker path succeeds.
+6. Require each agent to write completion via `polywave-tools set-completion`. When repository context must be explicit, use the global flag form: `polywave-tools --repo-dir <repo-root> set-completion ...`.
+7. Finalize with:
    ```bash
    polywave-tools finalize-wave <impl-path> --wave <N> --repo-dir <repo-root>
    ```
