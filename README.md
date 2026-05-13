@@ -99,8 +99,9 @@ The Codex port now carries the same basic disclosure structure as the Claude imp
 - core orchestrator skill in `SKILL.md`
 - on-demand protocol references in `references/`
 - deterministic routing scripts in `scripts/inject-context` and `scripts/inject-agent-context`
+- deterministic prompt builders in `scripts/build-scout-prompt` and `scripts/build-wave-agent-prompt`
 
-Because Codex does not expose Claude's agent-prompt rewrite hooks, the live `$polywave` skill must call these scripts explicitly inside the active loop before delegating to Polywave custom agents. The fallback launcher scripts now do the same thing.
+Because Codex does not expose Claude's agent-prompt rewrite hooks, the live `$polywave` skill must call these scripts explicitly inside the active loop before delegating to Polywave custom agents. The prompt builders now centralize that assembly so the live loop and fallback launchers use the same generated prompt shape.
 
 The exact primary-path procedure is documented in `references/live-loop-playbook.md` and is now the expected in-loop orchestration contract.
 
@@ -108,7 +109,9 @@ The exact primary-path procedure is documented in `references/live-loop-playbook
 
 What exists now is the first concrete scout path, not a full orchestration layer.
 
-Current blocker on the primary in-loop path: a fresh live `$polywave scout` proof run loaded the installed skill and disclosure scripts correctly, but custom-agent delegation in Codex did not yet complete, so the primary path still needs explicit launch-contract work before it can be claimed as proven.
+Current proven state on the primary path: a live `$polywave scout` proof run wrote a real IMPL manifest and `polywave-tools finalize-scout` passed.
+
+Current blocker on the primary wave path: the launcher/input path was dropping prepared agents after the first `codex exec`; that is now fixed and the end-to-end finalize path is being revalidated on the corrected launcher (see implementation notes).
 
 1. Install `polywave-tools` and run `./install.sh` from this repo.
 2. Add the target-repo guidance snippet to the target repository if needed:
