@@ -22,6 +22,22 @@ The stricter model where one active Codex CLI session both orchestrates and dire
 
 This conclusion is provisional and subject to revision if future Codex runtime behavior changes or a third viable in-loop worker-launch mechanism is found.
 
+## Relevant Codex Config Evidence
+
+Official Codex configuration docs support several parts of the current interpretation:
+
+- `sandbox_workspace_write.writable_roots` provides additional writable roots in `workspace-write` mode. That is consistent with the out-of-session worker model where the prepared worktree plus manifest repo root are made writable.
+- `agents.max_depth` and `agents.max_threads` confirm that Codex exposes subagent nesting/concurrency controls, but these are capacity controls, not guarantees that child workers can safely commit inside git worktrees.
+- The advanced config docs explicitly warn that in `workspace-write` mode, some environments keep `.git/` and `.codex/` read-only even when the rest of the workspace is writable. The docs specifically note that commands like `git commit` may still require approval to run outside the sandbox.
+
+Taken together, these docs do not contradict our runtime results. They strengthen the current provisional reading:
+- Codex is compatible with a multi-process worker model under configured writable roots.
+- The docs do not guarantee that in-session spawned workers or nested `codex exec` launches are viable for git worktree commits.
+
+Primary sources:
+- https://developers.openai.com/codex/config-reference
+- https://developers.openai.com/codex/config-advanced
+
 The Codex implementation is not a hook-for-hook port. Codex hooks are best treated as a policy engine and feedback loop. The hard safety model must combine:
 
 1. Codex workspace / sandbox scoping for worktree isolation
