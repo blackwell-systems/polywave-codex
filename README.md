@@ -11,7 +11,7 @@
 
 <p align="center"><strong>Parallel AI agents that don't break each other's code.</strong> Now on <a href="https://github.com/openai/codex">Codex CLI</a>.</p>
 
-> **Status:** Early implementation. The hook harness and hook installer exist, but this is not a runnable Polywave implementation yet. See [IMPLEMENTATION-NOTES.md](IMPLEMENTATION-NOTES.md) for the current mapping and enforcement notes, and [ROADMAP.md](ROADMAP.md) for the active implementation plan.
+> **Status:** Early implementation. The Polywave execution model is provisionally viable on Codex when worker execution happens in separate `codex exec` processes. The pure in-session wave-worker model inside one active Codex loop is not yet viable in the runtime we tested. See [IMPLEMENTATION-NOTES.md](IMPLEMENTATION-NOTES.md) for the current evidence and [ROADMAP.md](ROADMAP.md) for the active implementation plan.
 
 ## What is this?
 

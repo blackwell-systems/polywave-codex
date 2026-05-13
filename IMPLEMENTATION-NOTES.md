@@ -12,6 +12,16 @@ Secondary surfaces:
 
 Implementation decisions should optimize for the in-loop `$polywave` path first. Wrapper scripts are supporting tools, not the main product surface.
 
+## Provisional Conclusion
+
+Based on current runtime proof, the Polywave parallel execution model is provisionally viable on Codex when prepared workers run as separate out-of-session `codex exec` processes.
+
+The stricter model where one active Codex CLI session both orchestrates and directly hosts all wave workers is not yet viable in the tested runtime:
+- in-session spawned workers hit git worktree metadata write failures
+- nested `codex exec` launched from inside the active loop fails before worker start
+
+This conclusion is provisional and subject to revision if future Codex runtime behavior changes or a third viable in-loop worker-launch mechanism is found.
+
 The Codex implementation is not a hook-for-hook port. Codex hooks are best treated as a policy engine and feedback loop. The hard safety model must combine:
 
 1. Codex workspace / sandbox scoping for worktree isolation
