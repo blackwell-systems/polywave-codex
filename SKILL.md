@@ -28,13 +28,11 @@ What still remains:
 
 ## Execution Surface
 
-Primary:
-- the live Codex CLI session with `$polywave` invoked in the active loop
+**Scout:** in-session via the active Codex CLI loop (`$polywave scout`). Proven end-to-end.
 
-Secondary:
-- repo-local launcher scripts in `scripts/` for development, debugging, and fallback automation
+**Wave:** CLI launcher from terminal (`scripts/run-polywave-wave`). Proven end-to-end. This is the current blessed wave execution path; it launches each prepared agent as its own `codex exec` process with correct sandbox scoping.
 
-Do not present the launcher scripts as the main product surface.
+**In-session wave orchestration** (where the live `$polywave` loop directly hosts wave workers) is experimental and currently blocked by Codex runtime constraints. Do not rely on it for real wave execution.
 
 ## Installed Agents
 
@@ -178,9 +176,15 @@ Current minimal scout contract:
 
 When asked to run a wave-like flow:
 1. Confirm the IMPL and wave target.
-2. Load the matching orchestrator context from `scripts/inject-context` when the request maps to wave execution or failure-routing.
-3. Ensure prepare/finalize is routed through `polywave-tools`.
-4. Build the wave-agent prompt with `scripts/build-wave-agent-prompt` from the prepared brief and worktree context.
-5. Do not rely on in-session spawned workers for prepared wave commits; that path has shown git worktree metadata write failures in runtime proof.
-6. Do not assume nested `codex exec` launches from inside the active Codex loop are viable either; current runtime proof hit `failed to initialize in-process app-server client: Operation not permitted` before worker execution.
-7. Treat the active `$polywave` loop as the primary orchestration surface, but treat actual prepared worker execution inside that same session as a currently unresolved runtime constraint.
+2. Direct the user to run the CLI launcher from their terminal:
+   ```bash
+   scripts/run-polywave-wave <manifest-path> --wave <N> --repo-dir <repo-root>
+   ```
+   This is the current proven wave execution path. It calls `polywave-tools prepare-wave`, launches each agent as a separate `codex exec --cd <worktree>` process, and runs `polywave-tools finalize-wave`.
+3. If the user wants to understand what the launcher does, or needs to customize it, the steps are:
+   - `polywave-tools prepare-wave <manifest> --wave <N> --repo-dir <dir> --json-only`
+   - For each prepared agent: `codex exec --skip-git-repo-check --sandbox workspace-write --cd <worktree> "<prompt>"`
+   - `polywave-tools finalize-wave <manifest> --wave <N> --repo-dir <dir>`
+4. Do not attempt in-session wave worker execution. Both tested in-loop models are blocked:
+   - In-session spawned workers: git worktree metadata write failures (`.git/worktrees/.../index.lock`)
+   - Nested `codex exec` from inside active session: `Operation not permitted`

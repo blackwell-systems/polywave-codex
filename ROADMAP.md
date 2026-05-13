@@ -228,12 +228,16 @@ Work in this order unless new evidence changes the risk profile:
 
 ## Definition of “Ready to Claim”
 
-Do not claim a real Codex Polywave implementation until all of these are true:
+Criteria for claiming a usable Codex Polywave implementation:
 
-- install path is documented and repeatable
-- scout flow works
-- at least one real wave flow works
-- proven mutation surfaces remain inside enforcement coverage
-- `polywave-tools` gates are mandatory in the executed flow
+- [x] install path is documented and repeatable
+- [x] scout flow works (in-session, proven)
+- [x] at least one real wave flow works (CLI launcher, proven end-to-end)
+- [x] proven mutation surfaces remain inside enforcement coverage
+- [x] `polywave-tools` gates are mandatory in the executed flow
+
+**This bar is met as of 2026-05-12.** The implementation is usable in hybrid mode: scout in-session, wave via CLI launcher.
+
+Remaining work is UX improvement (single-session wave, parity polish) and hardening (fail-open characterization), not viability.
 
 Do not claim hardening is complete until fail-open behavior is explicitly characterized.

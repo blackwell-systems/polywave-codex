@@ -11,7 +11,7 @@
 
 <p align="center"><strong>Parallel AI agents that don't break each other's code.</strong> Now on <a href="https://github.com/openai/codex">Codex CLI</a>.</p>
 
-> **Status:** Early implementation. The Polywave execution model is provisionally viable on Codex when worker execution happens in separate `codex exec` processes. The pure in-session wave-worker model inside one active Codex loop is not yet viable in the runtime we tested. See [IMPLEMENTATION-NOTES.md](IMPLEMENTATION-NOTES.md) for the current evidence and [ROADMAP.md](ROADMAP.md) for the active implementation plan.
+> **Status:** Usable. Scout runs in-session (`$polywave scout`). Wave execution runs from your terminal via `scripts/run-polywave-wave`, which launches parallel agents as separate `codex exec` processes with full worktree isolation. The single-session wave experience (where `$polywave wave` hosts workers inside the live Codex loop) is not yet viable due to Codex runtime sandbox constraints. See [IMPLEMENTATION-NOTES.md](IMPLEMENTATION-NOTES.md) for details.
 
 ## What is this?
 
@@ -84,11 +84,25 @@ After the Codex implementation exists, restart Codex and run:
 $polywave scout "add a caching layer to the API client"
 ```
 
-## Primary Execution Surface
+## How to Use Polywave on Codex
 
-The primary product surface is the active Codex CLI loop with the installed `$polywave` skill.
+**Scout (in-session):** Start Codex and invoke the skill directly:
 
-Use the skill in the live Codex session for real Polywave orchestration. The repo-local scripts are supporting tools for development, debugging, and fallback automation; they are not the primary interface.
+```
+$polywave scout "add a caching layer to the API client"
+```
+
+The orchestrator delegates to `polywave-scout`, which writes an IMPL manifest validated through `polywave-tools`.
+
+**Wave (from terminal):** After reviewing the IMPL, run the wave launcher:
+
+```bash
+scripts/run-polywave-wave docs/IMPL/IMPL-caching.yaml --wave 1 --repo-dir "$PWD"
+```
+
+This prepares worktrees, launches each agent as a parallel `codex exec` process, and finalizes (merge + verify + cleanup). All safety properties hold: disjoint file ownership enforced via polywave-tools, worktree isolation via per-process sandbox scoping.
+
+**Why the split?** Codex's sandbox prevents in-session subagents from writing to `.git/worktree/` metadata (needed for commits), and nested `codex exec` from inside an active session is blocked. The CLI launcher sidesteps both constraints by running each agent as a top-level process.
 
 ## Progressive Disclosure
 
